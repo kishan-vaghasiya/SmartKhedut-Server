@@ -1,0 +1,6 @@
+node_modules/
+.env
+uploads/trade/*
+uploads/market/*
+!uploads/trade/.gitkeep
+!uploads/market/.gitkeep
