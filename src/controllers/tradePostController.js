@@ -14,15 +14,18 @@ function serialize(req, post) {
 }
 
 // GET /api/trade/posts?page=&limit=&category=&search=&status=&location=
-// Public list — the app's Trade tab. Only "active" posts are visible unless
-// the caller is the owner or an admin explicitly asks for another status.
+// Public list — the app's Trade tab. Posts are visible without admin approval.
 const listPosts = asyncHandler(async (req, res) => {
   const { page, limit, skip } = getPagination(req.query);
   const { category, search, location, sort } = req.query;
 
   const filter = {};
   const status = req.query.status;
-  filter.status = status || 'active';
+  if (status) {
+    filter.status = status;
+  } else {
+    filter.status = { $in: ['active', 'pending'] };
+  }
 
   if (category) filter.category = category;
   if (location) filter.location = new RegExp(location, 'i');
@@ -69,7 +72,12 @@ const listMyPosts = asyncHandler(async (req, res) => {
   if (req.query.status) filter.status = req.query.status;
 
   const [posts, total] = await Promise.all([
-    TradePost.find(filter).populate('category', 'name nameEn slug icon').sort({ createdAt: -1 }).skip(skip).limit(limit),
+    TradePost.find(filter)
+      .populate('category', 'name nameEn slug icon')
+      .populate('seller', 'username mobile location verified')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit),
     TradePost.countDocuments(filter),
   ]);
 
@@ -109,7 +117,7 @@ const createPost = asyncHandler(async (req, res) => {
     photos,
     seller: req.user._id,
     postedBy: 'farmer',
-    status: 'pending', // goes live after admin approval, mirrors admin's moderation queue
+    status: 'active',
   });
 
   const populated = await post.populate([
@@ -117,7 +125,7 @@ const createPost = asyncHandler(async (req, res) => {
     { path: 'seller', select: 'username mobile location verified' },
   ]);
 
-  return success(res, { statusCode: 201, message: 'Post submitted for review', data: serialize(req, populated) });
+  return success(res, { statusCode: 201, message: 'Post created', data: serialize(req, populated) });
 });
 
 // PUT /api/trade/posts/:id  (protected — owner only; multipart optional to add more photos)
@@ -144,7 +152,7 @@ const updatePost = asyncHandler(async (req, res) => {
     post.photos = [...post.photos, ...newPhotos].slice(0, 5);
   }
 
-  post.status = 'pending'; // re-review after edits
+  post.status = 'active';
   await post.save();
 
   return success(res, { message: 'Post updated', data: serialize(req, post) });

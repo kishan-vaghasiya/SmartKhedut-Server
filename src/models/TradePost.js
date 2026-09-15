@@ -21,7 +21,7 @@ const tradePostSchema = new mongoose.Schema(
     postedBy: { type: String, enum: ['farmer', 'admin'], default: 'farmer' },
 
     verified: { type: Boolean, default: false },
-    status: { type: String, enum: ['active', 'pending', 'rejected', 'hidden'], default: 'pending' },
+    status: { type: String, enum: ['active', 'pending', 'rejected', 'hidden'], default: 'active' },
     rating: { type: Number, default: 0, min: 0, max: 5 },
   },
   { timestamps: true },
