@@ -34,7 +34,7 @@ const getCategory = asyncHandler(async (req, res) => {
 
 // POST /api/admin/trade/categories  (admin)
 const createCategory = asyncHandler(async (req, res) => {
-  const { name, nameEn, icon, active } = req.body;
+  const { name, nameEn, nameHi, icon, active } = req.body;
   if (!name || !nameEn) {
     return error(res, { statusCode: 400, message: 'name and nameEn are required' });
   }
@@ -42,7 +42,7 @@ const createCategory = asyncHandler(async (req, res) => {
   const exists = await TradeCategory.findOne({ slug });
   if (exists) return error(res, { statusCode: 409, message: 'A category with this name already exists' });
 
-  const category = await TradeCategory.create({ name, nameEn, slug, icon, active });
+  const category = await TradeCategory.create({ name, nameEn, nameHi, slug, icon, active });
   return success(res, { statusCode: 201, message: 'Trade category created', data: category });
 });
 
@@ -51,12 +51,13 @@ const updateCategory = asyncHandler(async (req, res) => {
   const category = await TradeCategory.findById(req.params.id);
   if (!category) return error(res, { statusCode: 404, message: 'Category not found' });
 
-  const { name, nameEn, icon, active } = req.body;
+  const { name, nameEn, nameHi, icon, active } = req.body;
   if (name !== undefined) category.name = name;
   if (nameEn !== undefined) {
     category.nameEn = nameEn;
     category.slug = slugify(nameEn);
   }
+  if (nameHi !== undefined) category.nameHi = nameHi;
   if (icon !== undefined) category.icon = icon;
   if (active !== undefined) category.active = active;
 

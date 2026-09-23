@@ -7,6 +7,7 @@ const marketCategorySchema = new mongoose.Schema(
   {
     name: { type: String, required: true, trim: true }, // ગાય
     nameEn: { type: String, required: true, trim: true }, // Cow
+    nameHi: { type: String, default: '', trim: true }, // गाय (optional, falls back to nameEn)
     slug: { type: String, required: true, unique: true, lowercase: true, trim: true }, // cow
     icon: { type: String, default: '🐄' },
     group: {

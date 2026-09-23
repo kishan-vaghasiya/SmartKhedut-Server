@@ -106,7 +106,7 @@ const createAd = asyncHandler(async (req, res) => {
     photos,
     postedByUser: req.user._id,
     postedBy: 'farmer',
-    status: 'pending',
+    status: 'active',
   });
 
   const populated = await ad.populate([
@@ -142,7 +142,7 @@ const updateAd = asyncHandler(async (req, res) => {
     ad.photos = [...ad.photos, ...newPhotos].slice(0, 4);
   }
 
-  ad.status = 'pending';
+  ad.status = 'active';
   await ad.save();
 
   return success(res, { message: 'Advertisement updated', data: serialize(req, ad) });
@@ -192,8 +192,8 @@ const adminUpdateAdStatus = asyncHandler(async (req, res) => {
   if (!ad) return error(res, { statusCode: 404, message: 'Advertisement not found' });
 
   if (status) {
-    if (!['active', 'pending', 'rejected', 'hidden'].includes(status)) {
-      return error(res, { statusCode: 400, message: 'status must be active, pending, rejected or hidden' });
+    if (!['active', 'rejected', 'hidden'].includes(status)) {
+      return error(res, { statusCode: 400, message: 'status must be active, rejected or hidden' });
     }
     ad.status = status;
   }
@@ -257,8 +257,8 @@ const adminUpdateAd = asyncHandler(async (req, res) => {
   if (condition !== undefined) ad.condition = condition === 'New' ? 'New' : 'Used';
   if (verified !== undefined) ad.verified = verified;
   if (status !== undefined) {
-    if (!['active', 'pending', 'rejected', 'hidden'].includes(status)) {
-      return error(res, { statusCode: 400, message: 'status must be active, pending, rejected or hidden' });
+    if (!['active', 'rejected', 'hidden'].includes(status)) {
+      return error(res, { statusCode: 400, message: 'status must be active, rejected or hidden' });
     }
     ad.status = status;
   }

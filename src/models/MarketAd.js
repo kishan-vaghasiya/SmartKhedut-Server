@@ -19,7 +19,7 @@ const marketAdSchema = new mongoose.Schema(
     postedBy: { type: String, enum: ['farmer', 'admin'], default: 'farmer' },
 
     verified: { type: Boolean, default: false },
-    status: { type: String, enum: ['active', 'pending', 'rejected', 'hidden'], default: 'pending' },
+    status: { type: String, enum: ['active', 'rejected', 'hidden'], default: 'active' },
   },
   { timestamps: true },
 );

@@ -29,9 +29,21 @@ const getScheme = asyncHandler(async (req, res) => {
 
 // POST /api/admin/schemes  (admin)
 const createScheme = asyncHandler(async (req, res) => {
-  const { name, nameEn, tag, benefit, description, active } = req.body;
+  const {
+    name, nameEn, nameHi,
+    tag, tagEn, tagHi,
+    benefit, benefitEn, benefitHi,
+    description, descriptionEn, descriptionHi,
+    active,
+  } = req.body;
   if (!name || !nameEn) return error(res, { statusCode: 400, message: 'name and nameEn are required' });
-  const scheme = await Scheme.create({ name, nameEn, tag, benefit, description, active });
+  const scheme = await Scheme.create({
+    name, nameEn, nameHi,
+    tag, tagEn, tagHi,
+    benefit, benefitEn, benefitHi,
+    description, descriptionEn, descriptionHi,
+    active,
+  });
   return success(res, { statusCode: 201, message: 'Scheme created', data: scheme });
 });
 
@@ -40,12 +52,25 @@ const updateScheme = asyncHandler(async (req, res) => {
   const scheme = await Scheme.findById(req.params.id);
   if (!scheme) return error(res, { statusCode: 404, message: 'Scheme not found' });
 
-  const { name, nameEn, tag, benefit, description, active } = req.body;
+  const {
+    name, nameEn, nameHi,
+    tag, tagEn, tagHi,
+    benefit, benefitEn, benefitHi,
+    description, descriptionEn, descriptionHi,
+    active,
+  } = req.body;
   if (name !== undefined) scheme.name = name;
   if (nameEn !== undefined) scheme.nameEn = nameEn;
+  if (nameHi !== undefined) scheme.nameHi = nameHi;
   if (tag !== undefined) scheme.tag = tag;
+  if (tagEn !== undefined) scheme.tagEn = tagEn;
+  if (tagHi !== undefined) scheme.tagHi = tagHi;
   if (benefit !== undefined) scheme.benefit = benefit;
+  if (benefitEn !== undefined) scheme.benefitEn = benefitEn;
+  if (benefitHi !== undefined) scheme.benefitHi = benefitHi;
   if (description !== undefined) scheme.description = description;
+  if (descriptionEn !== undefined) scheme.descriptionEn = descriptionEn;
+  if (descriptionHi !== undefined) scheme.descriptionHi = descriptionHi;
   if (active !== undefined) scheme.active = active;
 
   await scheme.save();
