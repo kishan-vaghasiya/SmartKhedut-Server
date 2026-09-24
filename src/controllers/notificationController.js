@@ -90,6 +90,40 @@ const sendNotification = asyncHandler(async (req, res) => {
   });
 });
 
+// GET /api/user/notifications  (protected user) ?page=&limit=
+// Returns the global notification list to the app, newest first.
+const getUserNotifications = asyncHandler(async (req, res) => {
+  const { page, limit, skip } = getPagination(req.query, { defaultLimit: 20, maxLimit: 100 });
+
+  const [items, total] = await Promise.all([
+    Notification.find().sort({ createdAt: -1 }).skip(skip).limit(limit).populate('sentBy', 'name email'),
+    Notification.countDocuments(),
+  ]);
+
+  return success(res, {
+    message: 'Notifications fetched',
+    data: items,
+    pagination: buildPaginationMeta({ page, limit, total }),
+  });
+});
+
+// DELETE /api/user/notifications/:id  (protected user)
+const deleteNotification = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  const notification = await Notification.findById(id);
+  if (!notification) {
+    return error(res, { statusCode: 404, message: 'Notification not found' });
+  }
+
+  await Notification.findByIdAndDelete(id);
+
+  return success(res, {
+    message: 'Notification deleted successfully',
+    data: { id },
+  });
+});
+
 // GET /api/admin/notifications  (protected admin) ?page=&limit=
 // History of notifications sent from the admin panel, newest first.
 const listNotifications = asyncHandler(async (req, res) => {
@@ -107,4 +141,11 @@ const listNotifications = asyncHandler(async (req, res) => {
   });
 });
 
-module.exports = { saveFcmToken, removeFcmToken, sendNotification, listNotifications };
+module.exports = {
+  saveFcmToken,
+  removeFcmToken,
+  sendNotification,
+  getUserNotifications,
+  deleteNotification,
+  listNotifications,
+};

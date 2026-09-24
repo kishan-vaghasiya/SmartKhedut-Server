@@ -56,18 +56,23 @@ const marketCategories = [
 async function run() {
   await connectDB();
 
+  const adminName = process.env.DEFAULT_ADMIN_NAME || 'Sandhya Patel';
   const adminEmail = (process.env.DEFAULT_ADMIN_EMAIL || 'admin@smartkhedut.in').toLowerCase();
   const existingAdmin = await Admin.findOne({ email: adminEmail });
+
   if (!existingAdmin) {
     await Admin.create({
-      name: process.env.DEFAULT_ADMIN_NAME || 'Meera Shah',
+      name: adminName,
       email: adminEmail,
       password: process.env.DEFAULT_ADMIN_PASSWORD || 'Admin@123',
       role: 'Super Admin',
     });
     console.log(`Created default admin: ${adminEmail} / ${process.env.DEFAULT_ADMIN_PASSWORD || 'Admin@123'}`);
   } else {
-    console.log('Default admin already exists, skipping.');
+    const changed = existingAdmin.name !== adminName;
+    existingAdmin.name = adminName;
+    await existingAdmin.save();
+    console.log(changed ? `Updated default admin name to ${adminName}.` : 'Default admin already has the correct name.');
   }
 
   for (const cat of tradeCategories) {
