@@ -70,7 +70,7 @@ Errors:
 | GET | /api/trade/posts/mine | user token, own posts any status |
 | GET | /api/trade/posts/:id | public |
 | POST | /api/trade/posts | user token, multipart `photos` (up to 5) + name, category, price, quantity, unit, description, location |
-| PUT | /api/trade/posts/:id | owner only |
+| PUT | /api/trade/posts/:id | owner only; updates name, price, quantity, unit, description, location; optional multipart `image` replaces photos or `photos` appends (up to 5 total) |
 | DELETE | /api/trade/posts/:id | owner only |
 | POST/PUT/DELETE | /api/admin/trade/categories | admin token |
 | GET | /api/admin/trade/posts | admin token, `?status=&category=&search=&page=&limit=` |
@@ -94,10 +94,14 @@ Same pattern as Trade, under `/api/market/categories` and `/api/market/ads`
 `GET /api/schemes` (public, paginated), `POST/PUT/DELETE/PATCH .../toggle` under `/api/admin/schemes` (admin token).
 
 ## 5. Postman
-Import `SmartKhedut.postman_collection.json` and `SmartKhedut.postman_environment.json`.
-Run **Auth > Register** or **Auth > Login**, then **Admin > Admin Login** — both automatically
-save `{{token}}` / `{{adminToken}}` into the environment via a small test script, so every
-other request in the collection just works.
+Import `SmartKhedut_Trade_API.postman_collection.json` into Postman. Its `baseUrl` collection
+variable defaults to `http://localhost:3000/api`; change it if your server uses another host or port.
+
+Run **Auth > Register User** (or **Auth > Login User** for an existing account), then
+**Trade Posts > List Trade Categories**, **Create Trade Post**, and
+**Update Trade Post (Image Optional)**. The collection automatically saves the user token,
+first category ID, and created post ID. For a text-only update, do not select a file in the
+`image` field; to replace the post image, select a JPG, PNG, or WEBP file.
 
 ## 6. Folder structure
 ```

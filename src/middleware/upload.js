@@ -33,6 +33,7 @@ function makeUploader(subfolder, maxCount) {
 
   return {
     array: (fieldName) => upload.array(fieldName, maxCount),
+    fields: (fieldSpecs) => upload.fields(fieldSpecs),
     relativeDir: `/uploads/${subfolder}`,
   };
 }

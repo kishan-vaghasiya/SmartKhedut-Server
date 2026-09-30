@@ -35,7 +35,12 @@ router.get('/trade/posts/:id', getPost);
 
 // ---- App user (protected) ----
 router.post('/trade/posts', protectUser, tradeUpload.array('photos'), createPost);
-router.put('/trade/posts/:id', protectUser, tradeUpload.array('photos'), updatePost);
+router.put(
+  '/trade/posts/:id',
+  protectUser,
+  tradeUpload.fields([{ name: 'photos', maxCount: 5 }, { name: 'image', maxCount: 1 }]),
+  updatePost,
+);
 router.delete('/trade/posts/:id', protectUser, deletePost);
 
 // ---- Admin ----

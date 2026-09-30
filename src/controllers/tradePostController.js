@@ -146,9 +146,12 @@ const updatePost = asyncHandler(async (req, res) => {
   if (description !== undefined) post.description = description;
   if (location !== undefined) post.location = location;
 
-  const files = req.files || [];
-  if (files.length > 0) {
-    const newPhotos = files.map((f) => `/uploads/trade/${f.filename}`);
+  const imageFiles = Array.isArray(req.files) ? [] : req.files?.image || [];
+  const photoFiles = Array.isArray(req.files) ? req.files : req.files?.photos || [];
+  if (imageFiles.length > 0) {
+    post.photos = imageFiles.map((f) => `/uploads/trade/${f.filename}`);
+  } else if (photoFiles.length > 0) {
+    const newPhotos = photoFiles.map((f) => `/uploads/trade/${f.filename}`);
     post.photos = [...post.photos, ...newPhotos].slice(0, 5);
   }
 
