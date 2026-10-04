@@ -93,6 +93,31 @@ Same pattern as Trade, under `/api/market/categories` and `/api/market/ads`
 ### Schemes
 `GET /api/schemes` (public, paginated), `POST/PUT/DELETE/PATCH .../toggle` under `/api/admin/schemes` (admin token).
 
+### News
+`GET /api/news` fetches India-focused news from NewsData.io. Set `NEWSDATA_API_KEY` in `.env`; the key is used only by the backend. `language` accepts `gu`, `hi`, or `en` (default `gu`); `category` accepts `all`, `agriculture`, `farmer`, `farming`, `crop`, `market`, `government-schemes`, `weather`, `gujarat`, or a supported crop name in Gujarati, Hindi, or English. `q` can be used for a custom search and `page` accepts the upstream pagination token.
+
+Examples (replace the host if needed):
+```text
+GET http://localhost:3000/api/news?language=gu
+GET http://localhost:3000/api/news?language=hi
+GET http://localhost:3000/api/news?language=en
+GET http://localhost:3000/api/news?language=gu&category=agriculture
+GET http://localhost:3000/api/news?language=gu&category=farmer
+GET http://localhost:3000/api/news?language=gu&category=crop
+GET http://localhost:3000/api/news?language=gu&category=market
+GET http://localhost:3000/api/news?language=gu&category=government-schemes
+GET http://localhost:3000/api/news?language=gu&category=weather
+GET http://localhost:3000/api/news?language=gu&category=gujarat
+GET http://localhost:3000/api/news?language=gu&q=ખેડૂત
+GET http://localhost:3000/api/news?language=hi&category=agriculture
+GET http://localhost:3000/api/news?language=hi&q=%E0%A4%95%E0%A4%BF%E0%A4%B8%E0%A4%BE%E0%A4%A8
+GET http://localhost:3000/api/news?language=en&category=agriculture
+GET http://localhost:3000/api/news?language=en&q=farmer
+GET http://localhost:3000/api/news?language=gu&page=NEXT_PAGE_TOKEN
+```
+
+News items include the original article `url`; the app should open that URL rather than relying on full article content, which may not be available on the NewsData.io free plan.
+
 ## 5. Postman
 Import `SmartKhedut_Trade_API.postman_collection.json` into Postman. Its `baseUrl` collection
 variable defaults to `http://localhost:3000/api`; change it if your server uses another host or port.

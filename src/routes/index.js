@@ -5,6 +5,7 @@ const marketRoutes = require('./marketRoutes');
 const schemeRoutes = require('./schemeRoutes');
 const adminRoutes = require('./adminRoutes');
 const notificationRoutes = require('./notificationRoutes');
+const newsRoutes = require('./newsRoutes');
 
 const router = express.Router();
 
@@ -14,6 +15,7 @@ router.use(marketRoutes);
 router.use(schemeRoutes);
 router.use(adminRoutes);
 router.use(notificationRoutes);
+router.use(newsRoutes);
 
 router.get('/health', (_req, res) => res.json({ success: true, message: 'API is healthy' }));
 
