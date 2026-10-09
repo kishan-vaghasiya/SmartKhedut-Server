@@ -7,6 +7,11 @@ const {
   adminVerifyUser,
 } = require('../controllers/userController');
 const { getStats } = require('../controllers/dashboardController');
+const {
+  adminListPasswordResetRequests,
+  adminApprovePasswordResetRequest,
+  adminRejectPasswordResetRequest,
+} = require('../controllers/passwordResetController');
 const { protectAdmin } = require('../middleware/auth');
 
 const router = express.Router();
@@ -20,5 +25,9 @@ router.get('/admin/users', protectAdmin, adminListUsers);
 router.get('/admin/users/:id', protectAdmin, adminGetUser);
 router.patch('/admin/users/:id/status', protectAdmin, adminUpdateUserStatus);
 router.patch('/admin/users/:id/verify', protectAdmin, adminVerifyUser);
+
+router.get('/admin/password-reset-requests', protectAdmin, adminListPasswordResetRequests);
+router.patch('/admin/password-reset-requests/:id/approve', protectAdmin, adminApprovePasswordResetRequest);
+router.patch('/admin/password-reset-requests/:id/reject', protectAdmin, adminRejectPasswordResetRequest);
 
 module.exports = router;

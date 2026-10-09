@@ -58,6 +58,7 @@ Errors:
 |---|---|---|---|
 | POST | /api/auth/register | username, mobile, password | - |
 | POST | /api/auth/login | mobile, password | - |
+| POST | /api/auth/password-reset-requests | mobile, newPassword, confirmPassword | - |
 | GET | /api/user/profile | - | Bearer user token |
 | PUT | /api/user/profile | username?, location?, avatar? | Bearer user token |
 | PUT | /api/user/change-password | currentPassword, newPassword | Bearer user token |
@@ -89,6 +90,18 @@ Same pattern as Trade, under `/api/market/categories` and `/api/market/ads`
 | GET | /api/admin/users?search=&status=&page=&limit= |
 | PATCH | /api/admin/users/:id/status |
 | PATCH | /api/admin/users/:id/verify |
+| GET | /api/admin/password-reset-requests?status=pending&page=&limit= | admin token |
+| PATCH | /api/admin/password-reset-requests/:id/approve | admin token, `{ "identityVerified": true }` |
+| PATCH | /api/admin/password-reset-requests/:id/reject | admin token |
+
+Password recovery uses support/admin verification instead of OTP. The app submits
+the registered mobile number and the new password to
+`POST /api/auth/password-reset-requests`. The password is stored as a hash while
+the request is pending; the user's password changes only after an admin
+independently verifies the requester's identity and approves it. The public
+endpoint returns the same response whether or not the mobile number has an
+account, to avoid exposing registered numbers. Admins can list pending requests,
+then approve or reject them using the protected endpoints above.
 
 ### Schemes
 `GET /api/schemes` (public, paginated), `POST/PUT/DELETE/PATCH .../toggle` under `/api/admin/schemes` (admin token).
