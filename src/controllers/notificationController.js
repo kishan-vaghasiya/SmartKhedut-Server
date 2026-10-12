@@ -96,8 +96,16 @@ const getUserNotifications = asyncHandler(async (req, res) => {
   const { page, limit, skip } = getPagination(req.query, { defaultLimit: 20, maxLimit: 100 });
 
   const [items, total] = await Promise.all([
-    Notification.find().sort({ createdAt: -1 }).skip(skip).limit(limit).populate('sentBy', 'name email'),
-    Notification.countDocuments(),
+    Notification.find({
+      $or: [{ recipientUser: null }, { recipientUser: req.user._id }],
+    })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate('sentBy', 'name email'),
+    Notification.countDocuments({
+      $or: [{ recipientUser: null }, { recipientUser: req.user._id }],
+    }),
   ]);
 
   return success(res, {
@@ -111,7 +119,10 @@ const getUserNotifications = asyncHandler(async (req, res) => {
 const deleteNotification = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
-  const notification = await Notification.findById(id);
+  const notification = await Notification.findOne({
+    _id: id,
+    $or: [{ recipientUser: null }, { recipientUser: req.user._id }],
+  });
   if (!notification) {
     return error(res, { statusCode: 404, message: 'Notification not found' });
   }
@@ -130,8 +141,12 @@ const listNotifications = asyncHandler(async (req, res) => {
   const { page, limit, skip } = getPagination(req.query, { defaultLimit: 20, maxLimit: 100 });
 
   const [items, total] = await Promise.all([
-    Notification.find().sort({ createdAt: -1 }).skip(skip).limit(limit).populate('sentBy', 'name email'),
-    Notification.countDocuments(),
+    Notification.find({ recipientUser: null })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate('sentBy', 'name email'),
+    Notification.countDocuments({ recipientUser: null }),
   ]);
 
   return success(res, {

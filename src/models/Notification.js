@@ -9,11 +9,14 @@ const notificationSchema = new mongoose.Schema(
     body: { type: String, required: true, trim: true },
     imageUrl: { type: String, default: '' },
     sentBy: { type: mongoose.Schema.Types.ObjectId, ref: 'Admin' },
+    recipientUser: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
     status: { type: String, enum: ['sent', 'failed'], default: 'sent' },
     error: { type: String, default: '' },
     recipientCount: { type: Number, default: 0 }, // active users with a saved fcmToken at send time
   },
   { timestamps: true },
 );
+
+notificationSchema.index({ recipientUser: 1, createdAt: -1 });
 
 module.exports = mongoose.model('Notification', notificationSchema);

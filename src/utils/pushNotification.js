@@ -54,6 +54,35 @@ async function sendToAllUsers({ title, body, imageUrl, data = {} }) {
   }
 }
 
+// Sends a private notification to one device without using the all-users topic.
+async function sendToUser({ token, title, body, data = {} }) {
+  const admin = getFirebaseAdmin();
+  if (!admin) {
+    return { success: false, error: 'Firebase is not configured on the server (see FIREBASE_SETUP.md)' };
+  }
+
+  try {
+    const messageId = await admin.messaging().send({
+      token,
+      notification: { title, body },
+      data: Object.fromEntries(Object.entries(data).map(([key, value]) => [key, String(value)])),
+      android: {
+        priority: 'high',
+        notification: { channelId: 'default' },
+      },
+      apns: {
+        payload: {
+          aps: { sound: 'default' },
+        },
+      },
+    });
+    return { success: true, messageId };
+  } catch (err) {
+    console.error('[push] Failed to send user notification:', err.message);
+    return { success: false, error: err.message };
+  }
+}
+
 // Subscribes a single device token to the broadcast topic. Called right
 // after the app saves/refreshes its FCM token.
 async function subscribeToAllUsersTopic(token) {
@@ -78,4 +107,10 @@ async function unsubscribeFromAllUsersTopic(token) {
   }
 }
 
-module.exports = { sendToAllUsers, subscribeToAllUsersTopic, unsubscribeFromAllUsersTopic, ALL_USERS_TOPIC };
+module.exports = {
+  sendToAllUsers,
+  sendToUser,
+  subscribeToAllUsersTopic,
+  unsubscribeFromAllUsersTopic,
+  ALL_USERS_TOPIC,
+};

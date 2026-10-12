@@ -4,6 +4,7 @@ const passwordResetRequestSchema = new mongoose.Schema(
   {
     mobile: { type: String, required: true, trim: true },
     passwordHash: { type: String, required: true, select: false },
+    fcmToken: { type: String, trim: true, select: false },
     status: {
       type: String,
       enum: ['pending', 'processing', 'approved', 'rejected'],

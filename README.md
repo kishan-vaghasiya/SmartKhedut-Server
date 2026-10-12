@@ -58,10 +58,16 @@ Errors:
 |---|---|---|---|
 | POST | /api/auth/register | username, mobile, password | - |
 | POST | /api/auth/login | mobile, password | - |
-| POST | /api/auth/password-reset-requests | mobile, newPassword, confirmPassword | - |
+| POST | /api/auth/password-reset-requests | mobile, newPassword, confirmPassword, fcmToken? | - |
 | GET | /api/user/profile | - | Bearer user token |
 | PUT | /api/user/profile | username?, location?, avatar? | Bearer user token |
 | PUT | /api/user/change-password | currentPassword, newPassword | Bearer user token |
+
+### Notifications (app)
+| Method | Route | Auth |
+|---|---|---|
+| GET | /api/user/notifications?page=&limit= | user token |
+| DELETE | /api/user/notifications/:id | user token |
 
 ### Trade
 | Method | Route | Notes |
@@ -95,13 +101,19 @@ Same pattern as Trade, under `/api/market/categories` and `/api/market/ads`
 | PATCH | /api/admin/password-reset-requests/:id/reject | admin token |
 
 Password recovery uses support/admin verification instead of OTP. The app submits
-the registered mobile number and the new password to
+the registered mobile number, the new password, and (recommended) the current
+Firebase device `fcmToken` to
 `POST /api/auth/password-reset-requests`. The password is stored as a hash while
 the request is pending; the user's password changes only after an admin
 independently verifies the requester's identity and approves it. The public
 endpoint returns the same response whether or not the mobile number has an
 account, to avoid exposing registered numbers. Admins can list pending requests,
-then approve or reject them using the protected endpoints above.
+then approve or reject them using the protected endpoints above. Either decision
+creates a private notification in `/api/user/notifications` and sends a targeted
+push to the request's `fcmToken` (or the user's previously registered token).
+The app should pass an FCM token from its forgot-password screen because the user
+may be logged out; the device token must be valid and Firebase push must be
+configured on the server for immediate push delivery.
 
 ### Schemes
 `GET /api/schemes` (public, paginated), `POST/PUT/DELETE/PATCH .../toggle` under `/api/admin/schemes` (admin token).
