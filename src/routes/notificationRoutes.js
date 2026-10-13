@@ -5,6 +5,7 @@ const {
   sendNotification,
   getUserNotifications,
   deleteNotification,
+  clearUserNotifications,
   listNotifications,
 } = require('../controllers/notificationController');
 const { protectUser, protectAdmin } = require('../middleware/auth');
@@ -17,6 +18,7 @@ router.delete('/user/fcm-token', protectUser, removeFcmToken);
 
 // App user: fetch/delete notifications
 router.get('/user/notifications', protectUser, getUserNotifications);
+router.delete('/user/notifications', protectUser, clearUserNotifications);
 router.delete('/user/notifications/:id', protectUser, deleteNotification);
 
 // Admin panel: broadcast a notification to every user + view send history
