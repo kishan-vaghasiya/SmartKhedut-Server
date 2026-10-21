@@ -53,7 +53,7 @@ const getNews = asyncHandler(async (req, res) => {
   });
 
   if (typeof language !== 'string' || !Object.hasOwn(NEWS_LANGUAGES, language)) {
-    return validationError(res, 'language must be one of: gu, hi, en');
+    return validationError(res, 'language must be one of: gu, hi, pa, mr, en');
   }
   if (category !== undefined && (
     typeof category !== 'string'

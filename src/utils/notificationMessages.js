@@ -1,9 +1,9 @@
-// Server-side copies of the password-reset decision texts, in the same three
-// languages the mobile app supports (en / gu / hi). The device language is sent
+// Server-side copies of the password-reset decision texts, in the same five
+// languages the mobile app supports (en / gu / hi / pa / mr). The device language is sent
 // by the app with the reset request, so the push the user sees on the lock
 // screen is in their own language.
 
-const SUPPORTED_LANGUAGES = ['en', 'gu', 'hi'];
+const SUPPORTED_LANGUAGES = ['en', 'gu', 'hi', 'pa', 'mr'];
 
 const PASSWORD_RESET_MESSAGES = {
   en: {
@@ -34,6 +34,26 @@ const PASSWORD_RESET_MESSAGES = {
     rejected: {
       title: 'पासवर्ड रीसेट स्वीकृत नहीं हुआ',
       body: 'आपका पासवर्ड रीसेट स्वीकृत नहीं हुआ। कृपया सहायता टीम से संपर्क करें।',
+    },
+  },
+  pa: {
+    approved: {
+      title: 'ਪਾਸਵਰਡ ਰੀਸੈੱਟ ਮਨਜ਼ੂਰ',
+      body: 'ਤੁਹਾਡਾ ਪਾਸਵਰਡ ਰੀਸੈੱਟ ਮਨਜ਼ੂਰ ਹੋ ਗਿਆ ਹੈ। ਤੁਸੀਂ ਜਮ੍ਹਾਂ ਕੀਤੇ ਨਵੇਂ ਪਾਸਵਰਡ ਨਾਲ ਸਾਈਨ ਇਨ ਕਰ ਸਕਦੇ ਹੋ।',
+    },
+    rejected: {
+      title: 'ਪਾਸਵਰਡ ਰੀਸੈੱਟ ਮਨਜ਼ੂਰ ਨਹੀਂ ਹੋਇਆ',
+      body: 'ਤੁਹਾਡਾ ਪਾਸਵਰਡ ਰੀਸੈੱਟ ਮਨਜ਼ੂਰ ਨਹੀਂ ਹੋਇਆ। ਕਿਰਪਾ ਕਰਕੇ ਸਹਾਇਤਾ ਨਾਲ ਸੰਪਰਕ ਕਰੋ।',
+    },
+  },
+  mr: {
+    approved: {
+      title: 'पासवर्ड रीसेट मंजूर',
+      body: 'तुमचा पासवर्ड रीसेट मंजूर झाला आहे. तुम्ही सबमिट केलेल्या नवीन पासवर्डने साइन इन करू शकता.',
+    },
+    rejected: {
+      title: 'पासवर्ड रीसेट मंजूर झाला नाही',
+      body: 'तुमचा पासवर्ड रीसेट मंजूर झाला नाही. कृपया सपोर्टशी संपर्क साधा.',
     },
   },
 };

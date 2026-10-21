@@ -6,7 +6,7 @@ const passwordResetRequestSchema = new mongoose.Schema(
     passwordHash: { type: String, required: true, select: false },
     fcmToken: { type: String, trim: true, select: false },
     // Language the requester uses in the app, so the approve/reject push is in their language.
-    language: { type: String, enum: ['en', 'gu', 'hi'], default: 'en' },
+    language: { type: String, enum: ['en', 'gu', 'hi', 'pa', 'mr'], default: 'en' },
     status: {
       type: String,
       enum: ['pending', 'processing', 'approved', 'rejected'],

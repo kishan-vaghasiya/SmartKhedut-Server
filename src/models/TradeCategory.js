@@ -6,6 +6,8 @@ const tradeCategorySchema = new mongoose.Schema(
     name: { type: String, required: true, trim: true }, // Gujarati label, e.g. શાકભાજી
     nameEn: { type: String, required: true, trim: true }, // Vegetables
     nameHi: { type: String, default: '', trim: true }, // सब्जियां (optional, falls back to nameEn)
+    namePa: { type: String, default: '', trim: true }, // ਸਬਜ਼ੀਆਂ (optional, falls back to nameHi/nameEn)
+    nameMr: { type: String, default: '', trim: true }, // भाजीपाला (optional, falls back to nameHi/nameEn)
     slug: { type: String, required: true, unique: true, lowercase: true, trim: true }, // vegetables
     icon: { type: String, default: '🌾' },
     active: { type: Boolean, default: true },
