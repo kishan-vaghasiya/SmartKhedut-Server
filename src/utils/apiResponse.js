@@ -4,9 +4,8 @@ function success(res, { statusCode = 200, message = 'Success', data = null, pagi
   return res.status(statusCode).json(body);
 }
 
-function error(res, { statusCode = 500, message = 'Something went wrong', errors = null }) {
-  const body = { success: false, message };
-  if (errors) body.errors = errors;
+function error(res, { statusCode = 500, message = 'Something went wrong', errors = [] }) {
+  const body = { success: false, message, errors };
   return res.status(statusCode).json(body);
 }
 

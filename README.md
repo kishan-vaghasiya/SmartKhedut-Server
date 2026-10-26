@@ -54,6 +54,11 @@ Errors:
 ```
 
 ### Auth (app)
+`PUT /api/user/profile` accepts optional `username` and `mobile` fields to
+update the signed-in user's profile; mobile numbers must be unique 10-digit
+strings. `PUT /api/user/change-password` requires `currentPassword`,
+`newPassword`, and `confirmPassword`.
+
 | Method | Route | Body | Auth |
 |---|---|---|---|
 | POST | /api/auth/register | username, mobile, password | - |
@@ -62,6 +67,49 @@ Errors:
 | GET | /api/user/profile | - | Bearer user token |
 | PUT | /api/user/profile | username?, location?, avatar? | Bearer user token |
 | PUT | /api/user/change-password | currentPassword, newPassword | Bearer user token |
+
+### App rating and feedback
+
+`POST /api/v1/app-ratings` requires a signed-in app user's Bearer token. Guests
+are not supported by the current user-authentication model. The authenticated
+user is taken from the token; any `userId` in the body is ignored. A user has one
+rating record, and submitting again updates that user's latest rating.
+
+| Method | Route | Auth | Purpose |
+|---|---|---|---|
+| POST | /api/v1/app-ratings | user token | Submit or update the current user's rating |
+| GET | /api/v1/admin/app-ratings?page=&limit=&rating=&language=&platform= | admin token | Paginated review list for the admin panel |
+
+POST JSON body:
+```json
+{
+  "rating": 5,
+  "review": "Optional feedback text",
+  "language": "gu",
+  "platform": "android",
+  "appVersion": "1.0.0"
+}
+```
+
+`rating` must be an integer from 1 through 5. `review` is optional and accepts
+up to 2000 characters. If supplied, `language` must be `en`, `gu`, `hi`, `pa`,
+or `mr`, and `platform` must be `android` or `ios`; `appVersion` is optional.
+Example success:
+```json
+{
+  "success": true,
+  "message": "App rating saved",
+  "data": { "id": "RATING_ID", "rating": 5, "createdAt": "2026-10-26T06:00:00.000Z" }
+}
+```
+
+The admin GET endpoint returns reviews newest first, with pagination metadata.
+Optional filters are `rating` (1-5), `language`, and `platform`. User identifiers
+and the reviewer's `username`, `mobile`, `location`, and `verified` status are
+included under the `user` property so admins can identify who submitted each
+review. Passwords and other private authentication data are never included.
+Rate submissions are limited to five requests per authenticated user per minute
+per server process.
 
 ### Notifications (app)
 | Method | Route | Auth |
@@ -101,8 +149,8 @@ Same pattern as Trade, under `/api/market/categories` and `/api/market/ads`
 | PATCH | /api/admin/password-reset-requests/:id/reject | admin token |
 
 Password recovery uses support/admin verification instead of OTP. The app submits
-the registered mobile number, the new password, and (recommended) the current
-Firebase device `fcmToken` to
+the registered mobile number, the new password, its confirmation, and
+(recommended) the current Firebase device `fcmToken` to
 `POST /api/auth/password-reset-requests`. The password is stored as a hash while
 the request is pending; the user's password changes only after an admin
 independently verifies the requester's identity and approves it. The public
@@ -114,6 +162,10 @@ push to the request's `fcmToken` (or the user's previously registered token).
 The app should pass an FCM token from its forgot-password screen because the user
 may be logged out; the device token must be valid and Firebase push must be
 configured on the server for immediate push delivery.
+
+Forgot-password recovery does not ask for the current password because the user
+may be signed out. Signed-in users who know their current password should use
+`PUT /api/user/change-password` instead.
 
 ### Schemes
 `GET /api/schemes` (public, paginated), `POST/PUT/DELETE/PATCH .../toggle` under `/api/admin/schemes` (admin token).

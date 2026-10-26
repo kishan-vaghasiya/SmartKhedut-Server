@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const AppRating = require('../models/AppRating');
 
 async function ensureUserIndexes() {
   try {
@@ -20,12 +21,22 @@ async function ensureUserIndexes() {
   }
 }
 
+async function ensureAppRatingIndexes() {
+  try {
+    await AppRating.collection.createIndex({ user: 1 }, { unique: true, name: 'user_1' });
+    await AppRating.collection.createIndex({ createdAt: -1 }, { name: 'createdAt_-1' });
+  } catch (error) {
+    console.error('App rating index sync failed:', error.message);
+  }
+}
+
 const connectDB = async () => {
   try {
     const mongoUri = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/smartkhedut';
     const conn = await mongoose.connect(mongoUri);
     console.log(`MongoDB connected: ${conn.connection.host}`);
     await ensureUserIndexes();
+    await ensureAppRatingIndexes();
   } catch (err) {
     console.error(`MongoDB connection error: ${err.message}`);
     if (!process.env.MONGO_URI) {

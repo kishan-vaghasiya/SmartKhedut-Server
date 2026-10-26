@@ -80,21 +80,53 @@ const getProfile = asyncHandler(async (req, res) => {
 
 // PUT /api/user/profile  (protected)
 const updateProfile = asyncHandler(async (req, res) => {
-  const { username, location, avatar } = req.body;
+  const { username, mobile, location, avatar } = req.body;
+
+  if (username !== undefined && (typeof username !== 'string' || !username.trim())) {
+    return error(res, { statusCode: 400, message: 'username must be a non-empty string' });
+  }
+  if (mobile !== undefined && (typeof mobile !== 'string' || !/^[0-9]{10}$/.test(mobile))) {
+    return error(res, { statusCode: 400, message: 'Mobile number must be exactly 10 digits' });
+  }
+  if (mobile !== undefined && mobile !== req.user.mobile) {
+    const existing = await User.findOne({ mobile }).select('_id');
+    if (existing) {
+      return error(res, { statusCode: 409, message: 'An account with this mobile number already exists' });
+    }
+  }
+
   if (username !== undefined) req.user.username = username;
+  if (mobile !== undefined) req.user.mobile = mobile;
   if (location !== undefined) req.user.location = location;
   if (avatar !== undefined) req.user.avatar = avatar;
-  await req.user.save();
+  try {
+    await req.user.save();
+  } catch (err) {
+    if (err.code === 11000 && err.keyPattern?.mobile) {
+      return error(res, { statusCode: 409, message: 'An account with this mobile number already exists' });
+    }
+    throw err;
+  }
   return success(res, { message: 'Profile updated', data: sanitizeUser(req.user) });
 });
 
-// PUT /api/user/change-password (protected)
+// PUT /api/user/change-password (protected) { currentPassword, newPassword, confirmPassword }
 const changePassword = asyncHandler(async (req, res) => {
-  const { currentPassword, newPassword } = req.body;
-  if (!currentPassword || !newPassword) {
-    return error(res, { statusCode: 400, message: 'currentPassword and newPassword are required' });
+  const { currentPassword, newPassword, confirmPassword } = req.body;
+  if (!currentPassword || !newPassword || !confirmPassword) {
+    return error(res, {
+      statusCode: 400,
+      message: 'currentPassword, newPassword and confirmPassword are required',
+    });
+  }
+  if (typeof currentPassword !== 'string' || typeof newPassword !== 'string' || typeof confirmPassword !== 'string') {
+    return error(res, { statusCode: 400, message: 'Passwords must be strings' });
+  }
+  if (newPassword !== confirmPassword) {
+    return error(res, { statusCode: 400, message: 'New password and confirm password do not match' });
   }
   const user = await User.findById(req.user._id).select('+password');
+  if (!user) return error(res, { statusCode: 404, message: 'User not found' });
   const match = await user.comparePassword(currentPassword);
   if (!match) return error(res, { statusCode: 401, message: 'Current password is incorrect' });
   if (newPassword.length < 6) {

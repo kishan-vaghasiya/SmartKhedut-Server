@@ -6,6 +6,7 @@ const schemeRoutes = require('./schemeRoutes');
 const adminRoutes = require('./adminRoutes');
 const notificationRoutes = require('./notificationRoutes');
 const newsRoutes = require('./newsRoutes');
+const appRatingRoutes = require('./appRatingRoutes');
 
 const router = express.Router();
 
@@ -16,6 +17,7 @@ router.use(schemeRoutes);
 router.use(adminRoutes);
 router.use(notificationRoutes);
 router.use(newsRoutes);
+router.use('/v1', appRatingRoutes);
 
 router.get('/health', (_req, res) => res.json({ success: true, message: 'API is healthy' }));
 
